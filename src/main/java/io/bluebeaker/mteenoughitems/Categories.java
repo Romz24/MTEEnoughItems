@@ -10,6 +10,9 @@ public class Categories {
 
         public static final String PEAT_ENGINE_UID = "mteenoughitems.forestry.peat_engine";
         public static final String PEAT_ENGINE = "category."+PEAT_ENGINE_UID+".name";
+
+        public static final String BEEKEEPING_FLOWERS_UID = "mteenoughitems.forestry.beekeeping_flowers";
+        public static final String BEEKEEPING_FLOWERS = "category."+BEEKEEPING_FLOWERS_UID+".name";
     }
     public static class Railcraft {
         public static final String BOILER_UID = "mteenoughitems.railcraft.boiler";

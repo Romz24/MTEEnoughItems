@@ -6,6 +6,7 @@ import forestry.energy.gui.GuiEnginePeat;
 import forestry.energy.gui.GuiGenerator;
 import io.bluebeaker.mteenoughitems.MTEEnoughItems;
 import io.bluebeaker.mteenoughitems.MTEEnoughItemsConfig;
+import io.bluebeaker.mteenoughitems.jei.forestry.BeekeepingFlowersCategory;
 import io.bluebeaker.mteenoughitems.jei.forestry.BioGeneratorCategory;
 import io.bluebeaker.mteenoughitems.jei.forestry.BiogasEngineCategory;
 import io.bluebeaker.mteenoughitems.jei.forestry.PeatEngineCategory;
@@ -54,6 +55,10 @@ public class MTEEIPlugin implements IModPlugin {
       if(MTEEnoughItemsConfig.forestry.bio_generator && ModChecker.IC2.isLoaded()) {
         registry.addRecipeCategories(new BioGeneratorCategory(guiHelper));
       }
+      if(MTEEnoughItemsConfig.forestry.beekeeping_flowers) {
+        registry.addRecipeCategories(new BeekeepingFlowersCategory(guiHelper));
+      }
+
     }
     if(ModChecker.Railcraft.isLoaded()){
       if(MTEEnoughItemsConfig.railcraft.fluid_firebox) {
@@ -111,6 +116,17 @@ public class MTEEIPlugin implements IModPlugin {
       if(MTEEnoughItemsConfig.forestry.bio_generator && ModChecker.IC2.isLoaded()){
         registry.addRecipes(BioGeneratorCategory.getRecipes(jeiHelpers),BioGeneratorCategory.UID);
         registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Forestry.name, "engine_generator"),BioGeneratorCategory.UID);
+      }
+
+      if(MTEEnoughItemsConfig.forestry.beekeeping_flowers) {
+        registry.addRecipes(BeekeepingFlowersCategory.getRecipes(jeiHelpers),BeekeepingFlowersCategory.UID);
+
+        for(String name: new String[]{"apiary", "bee_house", "alveary.plain", "cart.beehouse"}){
+          ItemStack itemstack = ItemUtils.getItemstack(ModChecker.Forestry.name, name);
+          if(!itemstack.isEmpty())
+            registry.addRecipeCatalyst(itemstack,BeekeepingFlowersCategory.UID);
+        };
+        registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Forestry.name, "cart.beehouse",1),BeekeepingFlowersCategory.UID);
       }
     }
 
