@@ -9,6 +9,7 @@ import forestry.apiculture.flowers.FlowerRegistry;
 import forestry.core.genetics.alleles.EnumAllele;
 import forestry.core.utils.BlockStateSet;
 import io.bluebeaker.mteenoughitems.Categories;
+import io.bluebeaker.mteenoughitems.MTEEnoughItems;
 import io.bluebeaker.mteenoughitems.jei.forestry.accessors.FlowerAccessor;
 import io.bluebeaker.mteenoughitems.jei.generic.GenericRecipeCategory;
 import io.bluebeaker.mteenoughitems.jei.utils.BlockTooltipCallbacks;
@@ -83,7 +84,10 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
         HashMultimap<String, Block> blocks = FlowerAccessor.acceptableBlocks.get(flowerRegistry1);
         Map<String, BlockStateSet> blockstates = FlowerAccessor.acceptableBlockStates.get(flowerRegistry1);
         HashMultimap<String, Flower> plantableFlowers = FlowerAccessor.plantableFlowers.get(flowerRegistry1);
-        if(blocks==null || blockstates==null || plantableFlowers==null) return recipes;
+        if(blocks==null || blockstates==null || plantableFlowers==null){
+            MTEEnoughItems.getLogger().warn("Failed to access FlowerRegistry, not loading flowers");
+            return recipes;
+        }
 
         // Get all flower types
         Map<String, FlowerProvider> flowerTypes = new HashMap<>();

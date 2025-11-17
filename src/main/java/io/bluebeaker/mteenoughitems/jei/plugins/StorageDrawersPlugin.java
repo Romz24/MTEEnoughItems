@@ -1,15 +1,18 @@
-package io.bluebeaker.mteenoughitems.jei.storagedrawers;
+package io.bluebeaker.mteenoughitems.jei.plugins;
 
 import io.bluebeaker.mteenoughitems.MTEEnoughItemsConfig;
-import mezz.jei.api.IModPlugin;
+import io.bluebeaker.mteenoughitems.jei.storagedrawers.DrawerSubtypeInterpreter;
 import mezz.jei.api.ISubtypeRegistry;
-import mezz.jei.api.JEIPlugin;
 
-@JEIPlugin
-public class StorageDrawersPlugin implements IModPlugin {
+public class StorageDrawersPlugin implements IPlugin {
     @Override
     public void registerSubtypes(ISubtypeRegistry subtypeRegistry) {
         if(MTEEnoughItemsConfig.storageDrawers.drawer_subtypes)
             new DrawerSubtypeInterpreter().register(subtypeRegistry);
+    }
+
+    @Override
+    public String getName() {
+        return "Storage Drawers";
     }
 }
