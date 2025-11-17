@@ -1,8 +1,11 @@
 package io.bluebeaker.mteenoughitems.jei.forestry;
 
 import com.google.common.collect.HashMultimap;
+import forestry.api.apiculture.BeeManager;
 import forestry.api.apiculture.FlowerManager;
+import forestry.api.apiculture.IBee;
 import forestry.api.genetics.IFlowerRegistry;
+import forestry.apiculture.ModuleApiculture;
 import forestry.apiculture.flowers.Flower;
 import forestry.apiculture.flowers.FlowerProvider;
 import forestry.apiculture.flowers.FlowerRegistry;
@@ -30,6 +33,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 import java.awt.*;
 import java.util.*;
@@ -53,9 +57,11 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
     public void setRecipe(IRecipeLayout recipeLayout, Wrapper wrapper, IIngredients iIngredients) {
         IGuiItemStackGroup guiItemStackGroup = recipeLayout.getItemStacks();
         BlockTooltipCallbacks callbacks = new BlockTooltipCallbacks();
+        this.addItemSlot(guiItemStackGroup,45,4,4);
+        guiItemStackGroup.set(45,wrapper.bees);
 
         for (int i=0;i<wrapper.items.size();i++) {
-            this.addItemSlot(guiItemStackGroup,i,MARGIN_X+18*(i%9),20+18*((i-1)/9));
+            this.addItemSlot(guiItemStackGroup,i,MARGIN_X+18*(i%9),26+18*((i-1)/9));
             guiItemStackGroup.set(i,wrapper.items.get(i));
 
             callbacks.add(i,wrapper.getFlowerDefs().get(i).blockState);
@@ -100,39 +106,70 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
         blockstates.keySet().forEach((s)->{if(!flowerTypes.containsKey(s)) flowerTypes.put(s,new FlowerProvider(s,s));});
         plantableFlowers.keySet().forEach((s)->{if(!flowerTypes.containsKey(s)) flowerTypes.put(s,new FlowerProvider(s,s));});
 
+        // Preprocess bees
+        Map<String,List<ItemStack>> flowersToBees = new HashMap<>();
+        addFlowersToBees(flowersToBees);
+
+
         // Get blocks for every flower type
         for (String flowerType : flowerTypes.keySet()) {
             Set<IBlockState> states = new HashSet<>();
-
+            // Add defined blockstates
             BlockStateSet iBlockStates = blockstates.get(flowerType);
             if(iBlockStates!=null)
                 states.addAll(iBlockStates);
-
+            // Add default state for defined blocks
             for (Block block : blocks.get(flowerType)) {
                 states.add(block.getDefaultState());
             }
-            List<FlowerDef> flowerDefs = new ArrayList<>();
-            for (IBlockState state : states) {
-                boolean plantable=false;
-                for (Flower flower : plantableFlowers.get(flowerType)) {
-                    if(flower.getBlockState()==state){
-                        plantable=true;
-                        break;
-                    }
-                }
-                flowerDefs.add(new FlowerDef(state, plantable));
+            // Check plantable
+            Set<IBlockState> plantable = new HashSet<>();
+            for (Flower flower : plantableFlowers.get(flowerType)) {
+                plantable.add(flower.getBlockState());
             }
 
-            List<IBlockState> states1 = new ArrayList<>(states);
-            states1.sort(Comparator.comparing(Object::toString));
+            List<FlowerDef> flowerDefs = new ArrayList<>();
+            for (IBlockState state : states) {
+                flowerDefs.add(new FlowerDef(state, plantable.contains(state)));
+            }
+            flowerDefs.sort(Comparator.comparing((f)->f.blockState.toString()));
 
             for (int i = 0; i < flowerDefs.size(); i=i+45) {
                 List<FlowerDef> subList = flowerDefs.subList(i,Math.min(i+45,flowerDefs.size()));
-                recipes.add(new Wrapper(flowerTypes.get(flowerType),subList));
+                recipes.add(new Wrapper(flowerTypes.get(flowerType),subList, flowersToBees.get(flowerType)));
             }
         }
 
         return recipes;
+    }
+
+    private static void addFlowersToBees(Map<String, List<ItemStack>> flowersToBees) {
+        if (BeeManager.beeRoot == null) return;
+        List<IBee> individualTemplates = BeeManager.beeRoot.getIndividualTemplates();
+
+        for (IBee individual : individualTemplates) {
+            individual.analyze();
+            String flowerType = individual.getGenome().getFlowerProvider().getFlowerType();
+            flowersToBees.computeIfAbsent(flowerType,(type)->new ArrayList<>());
+
+            NBTTagCompound nbt = new NBTTagCompound();
+            individual.writeToNBT(nbt);
+
+            ItemStack princess = new ItemStack(ModuleApiculture.getItems().beePrincessGE);
+            ItemStack drone = new ItemStack(ModuleApiculture.getItems().beeDroneGE);
+            princess.setTagCompound(nbt);
+            drone.setTagCompound(nbt);
+
+            individual.mate(individual);
+            ItemStack queen = new ItemStack(ModuleApiculture.getItems().beeQueenGE);
+            nbt = new NBTTagCompound();
+            individual.writeToNBT(nbt);
+            queen.setTagCompound(nbt);
+
+            flowersToBees.get(flowerType).add(queen);
+            flowersToBees.get(flowerType).add(princess);
+            flowersToBees.get(flowerType).add(drone);
+        }
     }
 
     public static class FlowerDef{
@@ -167,13 +204,16 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
         public final FlowerProvider provider;
         public final int size;
         public final List<FlowerDef> flowerDefs;
-        private final List<ItemStack> items;
+        public final List<ItemStack> items;
+        public final List<ItemStack> bees;
 
-        public Wrapper(FlowerProvider provider, List<FlowerDef> flowerDefs) {
+
+        public Wrapper(FlowerProvider provider, List<FlowerDef> flowerDefs, List<ItemStack> bees) {
             super();
             this.provider=provider;
             this.flowerDefs = Collections.unmodifiableList(flowerDefs);
             this.size=flowerDefs.size();
+            this.bees = bees;
 
             ArrayList<ItemStack> items = new ArrayList<>(size);
             for (FlowerDef flowerDef : flowerDefs) {
@@ -185,7 +225,12 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
 
         @Override
         public void getIngredients(IIngredients iIngredients) {
-            iIngredients.setInputs(VanillaTypes.ITEM,items);
+            List<List<ItemStack>> inputs = new ArrayList<>();
+            inputs.add(bees);
+            for (ItemStack item : items) {
+                inputs.add(Collections.singletonList(item));
+            }
+            iIngredients.setInputLists(VanillaTypes.ITEM,inputs);
             List<ItemStack> outputs = new ArrayList<>();
             for (int i = 0; i < items.size(); i++) {
                 if(flowerDefs.get(i).plantable){
