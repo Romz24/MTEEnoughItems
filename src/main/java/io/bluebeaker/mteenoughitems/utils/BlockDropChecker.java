@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.UUID;
+import java.util.*;
 
 public class BlockDropChecker {
     private static final DummyWorld world = new DummyWorld();
@@ -27,5 +27,25 @@ public class BlockDropChecker {
             MTEEnoughItems.getLogger().error("Error getting item for blockstate {}:",state,e);
         }
         return ItemStack.EMPTY;
+    }
+
+    public static Map<ItemStack,Set<IBlockState>> getGroupedDrops(Collection<IBlockState> blockStates){
+        Map<String,ItemStack> addedItems = new HashMap<>();
+        Map<ItemStack,Set<IBlockState>> blocksMap = new HashMap<>();
+
+        for (IBlockState blockState : blockStates) {
+            ItemStack drop = getDrop(blockState);
+            String item = drop.serializeNBT().toString();
+
+            if(!addedItems.containsKey(item)){
+                addedItems.put(item,drop);
+            }else {
+                drop = addedItems.get(item);
+            }
+
+            blocksMap.computeIfAbsent(drop,(i)-> new HashSet<>());
+            blocksMap.get(drop).add(blockState);
+        }
+        return blocksMap;
     }
 }

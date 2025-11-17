@@ -4,7 +4,9 @@ import com.google.common.collect.HashMultimap;
 import forestry.api.apiculture.FlowerManager;
 import forestry.api.genetics.IFlowerRegistry;
 import forestry.apiculture.flowers.Flower;
+import forestry.apiculture.flowers.FlowerProvider;
 import forestry.apiculture.flowers.FlowerRegistry;
+import forestry.core.genetics.alleles.EnumAllele;
 import forestry.core.utils.BlockStateSet;
 import io.bluebeaker.mteenoughitems.Categories;
 import io.bluebeaker.mteenoughitems.jei.forestry.accessors.FlowerAccessor;
@@ -24,7 +26,6 @@ import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
@@ -77,17 +78,25 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
         if(!(flowerRegistry instanceof FlowerRegistry)) return recipes;
 
         FlowerRegistry flowerRegistry1 = (FlowerRegistry) flowerRegistry;
-
+        // Access registered flowers
         HashMultimap<String, Block> blocks = FlowerAccessor.acceptableBlocks.get(flowerRegistry1);
         Map<String, BlockStateSet> blockstates = FlowerAccessor.acceptableBlockStates.get(flowerRegistry1);
         HashMultimap<String, Flower> plantableFlowers = FlowerAccessor.plantableFlowers.get(flowerRegistry1);
         if(blocks==null || blockstates==null || plantableFlowers==null) return recipes;
 
-        Set<String> flowerTypes = new HashSet<>(blocks.keySet());
-        flowerTypes.addAll(blockstates.keySet());
-        flowerTypes.addAll(plantableFlowers.keySet());
+        // Get all flower types
+        Map<String, FlowerProvider> flowerTypes = new HashMap<>();
+        for (EnumAllele.Flowers value : EnumAllele.Flowers.values()) {
+            flowerTypes.put(value.getValue().getFlowerType(),value.getValue());
+        }
 
-        for (String flowerType : flowerTypes) {
+        // Add dummy flower type for missing flower types (if added by other mods)
+        blocks.keySet().forEach((s)->{if(!flowerTypes.containsKey(s)) flowerTypes.put(s,new FlowerProvider(s,s));});
+        blockstates.keySet().forEach((s)->{if(!flowerTypes.containsKey(s)) flowerTypes.put(s,new FlowerProvider(s,s));});
+        plantableFlowers.keySet().forEach((s)->{if(!flowerTypes.containsKey(s)) flowerTypes.put(s,new FlowerProvider(s,s));});
+
+        // Get blocks for every flower type
+        for (String flowerType : flowerTypes.keySet()) {
             Set<IBlockState> states = new HashSet<>();
 
             BlockStateSet iBlockStates = blockstates.get(flowerType);
@@ -111,7 +120,7 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
                 }
             }
 
-            recipes.add(new Wrapper(flowerType,states1,plantable));
+            recipes.add(new Wrapper(flowerTypes.get(flowerType),states1,plantable));
         }
 
         return recipes;
@@ -137,15 +146,15 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
     }
 
     public static class Wrapper implements IRecipeWrapper {
-        public final String name;
+        public final FlowerProvider provider;
         public final int size;
         private final List<IBlockState> states;
         private final List<ItemStack> items;
         private final boolean[] plantable;
 
-        public Wrapper(String name, List<IBlockState> states, boolean[] plantable) {
+        public Wrapper(FlowerProvider provider, List<IBlockState> states, boolean[] plantable) {
             super();
-            this.name=name;
+            this.provider=provider;
             this.states = Collections.unmodifiableList(states);
             this.size=states.size();
 
@@ -167,7 +176,7 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
         public void drawInfo(Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
             int xPos = 16;
             int yPos = 4;
-            RenderUtils.drawTextAlignedMiddle(I18n.format("for.flowers." + name.toLowerCase()),recipeWidth/2,yPos, Color.gray.getRGB());
+            RenderUtils.drawTextAlignedMiddle(provider.getDescription(),recipeWidth/2,yPos, Color.gray.getRGB());
         }
 
         public List<IBlockState> getStates() {
