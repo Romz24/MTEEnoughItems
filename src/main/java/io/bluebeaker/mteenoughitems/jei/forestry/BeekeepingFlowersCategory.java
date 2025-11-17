@@ -26,6 +26,7 @@ import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
@@ -140,7 +141,7 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
 
             if(i>=plantable.length) return;
             if(plantable[i]){
-                list.add("Grows");
+                list.add(I18n.format("category.mteenoughitems.forestry.beekeeping_flowers.grow"));
             }
         }
     }
