@@ -39,7 +39,7 @@ public class MineralDepositCategory extends GenericRecipeCategory<MineralDeposit
     public void setRecipe(IRecipeLayout recipeLayout, Wrapper wrapper, IIngredients iIngredients) {
         IGuiItemStackGroup guiItemStackGroup = recipeLayout.getItemStacks();
         for (int i=0;i<wrapper.mineralMix.oreOutput.size();i++) {
-            this.addItemSlot(guiItemStackGroup,i,MARGIN_X+18*(i%9),24+18*((i-1)/9));
+            this.addItemSlot(guiItemStackGroup,i,MARGIN_X+18*(i%9),24+18*(i/9));
             guiItemStackGroup.set(i,wrapper.mineralMix.oreOutput.get(i));
         }
         guiItemStackGroup.addTooltipCallback(new TooltipCallback(wrapper));

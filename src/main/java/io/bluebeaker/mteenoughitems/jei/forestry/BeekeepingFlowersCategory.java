@@ -61,7 +61,7 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
         guiItemStackGroup.set(45,wrapper.bees);
 
         for (int i=0;i<wrapper.items.size();i++) {
-            this.addItemSlot(guiItemStackGroup,i,MARGIN_X+18*(i%9),26+18*((i-1)/9));
+            this.addItemSlot(guiItemStackGroup,i,MARGIN_X+18*(i%9),26+18*(i/9));
             guiItemStackGroup.set(i,wrapper.items.get(i));
 
             callbacks.add(i,wrapper.getFlowerDefs().get(i).blockState);
