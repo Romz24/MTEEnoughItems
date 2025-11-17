@@ -19,20 +19,17 @@ import io.bluebeaker.mteenoughitems.jei.railcraft.WorldSpikeFuelCategory;
 import io.bluebeaker.mteenoughitems.jei.thermal.FluidConversionCategory;
 import io.bluebeaker.mteenoughitems.jei.thermal.TreeFluidCategory;
 import io.bluebeaker.mteenoughitems.jei.thermal.TreeFluidFuelCategory;
+import io.bluebeaker.mteenoughitems.jei.utils.RegistryUtils;
 import io.bluebeaker.mteenoughitems.utils.ItemUtils;
 import io.bluebeaker.mteenoughitems.utils.LogTimer;
 import io.bluebeaker.mteenoughitems.utils.ModChecker;
 import mezz.jei.api.*;
-import mezz.jei.api.ingredients.IModIngredientRegistration;
 import mezz.jei.api.recipe.IRecipeCategoryRegistration;
 import mods.railcraft.client.gui.GuiBlastFurnace;
 import mods.railcraft.client.gui.GuiBoilerFluid;
 import mods.railcraft.client.gui.GuiBoilerSolid;
 import mods.railcraft.client.gui.GuiWorldspike;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-
-import javax.annotation.Nullable;
 
 
 @JEIPlugin
@@ -106,16 +103,16 @@ public class MTEEIPlugin implements IModPlugin {
 
       if(MTEEnoughItemsConfig.forestry.peat_engine){
         registry.addRecipes(PeatEngineCategory.getRecipes(jeiHelpers),PeatEngineCategory.UID);
-        registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Forestry.name, "engine_peat"),PeatEngineCategory.UID);
+        RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Forestry.name, "engine_peat"),PeatEngineCategory.UID);
       }
       if(MTEEnoughItemsConfig.forestry.biogas_engine){
         registry.addRecipes(BiogasEngineCategory.getRecipes(jeiHelpers),BiogasEngineCategory.UID);
-        registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Forestry.name, "engine_biogas"),BiogasEngineCategory.UID);
+        RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Forestry.name, "engine_biogas"),BiogasEngineCategory.UID);
       }
 
       if(MTEEnoughItemsConfig.forestry.bio_generator && ModChecker.IC2.isLoaded()){
         registry.addRecipes(BioGeneratorCategory.getRecipes(jeiHelpers),BioGeneratorCategory.UID);
-        registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Forestry.name, "engine_generator"),BioGeneratorCategory.UID);
+        RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Forestry.name, "engine_generator"),BioGeneratorCategory.UID);
       }
 
       if(MTEEnoughItemsConfig.forestry.beekeeping_flowers) {
@@ -124,9 +121,9 @@ public class MTEEIPlugin implements IModPlugin {
         for(String name: new String[]{"apiary", "bee_house", "alveary.plain", "cart.beehouse"}){
           ItemStack itemstack = ItemUtils.getItemstack(ModChecker.Forestry.name, name);
           if(!itemstack.isEmpty())
-            registry.addRecipeCatalyst(itemstack,BeekeepingFlowersCategory.UID);
+            RegistryUtils.tryAddItemCatalyst(registry, itemstack,BeekeepingFlowersCategory.UID);
         };
-        registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Forestry.name, "cart.beehouse",1),BeekeepingFlowersCategory.UID);
+        RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Forestry.name, "cart.beehouse",1),BeekeepingFlowersCategory.UID);
       }
     }
 
@@ -140,17 +137,17 @@ public class MTEEIPlugin implements IModPlugin {
       registry.addRecipeClickArea(GuiBoilerSolid.class,62,22,14,14,BoilerCategory.UID);
 
       for (int i = 1; i <=3; i++) {
-        registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Railcraft.name, "worldspike",i), WorldSpikeFuelCategory.UID);
+        RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Railcraft.name, "worldspike",i), WorldSpikeFuelCategory.UID);
       }
 
-      registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Railcraft.name, "blast_furnace"), BlastFurnaceFuelCategory.UID);
+      RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Railcraft.name, "blast_furnace"), BlastFurnaceFuelCategory.UID);
 
-      registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Railcraft.name, "boiler_firebox_solid"), BoilerCategory.UID);
-      registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Railcraft.name, "locomotive_steam_solid"), BoilerCategory.UID);
+      RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Railcraft.name, "boiler_firebox_solid"), BoilerCategory.UID);
+      RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Railcraft.name, "locomotive_steam_solid"), BoilerCategory.UID);
 
-      registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Railcraft.name, "boiler_firebox_fluid"),FluidFireboxCategory.UID, BoilerCategory.UID);
-      registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Railcraft.name, "boiler_tank_pressure_high"),FluidFireboxCategory.UID, BoilerCategory.UID);
-      registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.Railcraft.name, "boiler_tank_pressure_low"),FluidFireboxCategory.UID, BoilerCategory.UID);
+      RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Railcraft.name, "boiler_firebox_fluid"),FluidFireboxCategory.UID, BoilerCategory.UID);
+      RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Railcraft.name, "boiler_tank_pressure_high"),FluidFireboxCategory.UID, BoilerCategory.UID);
+      RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Railcraft.name, "boiler_tank_pressure_low"),FluidFireboxCategory.UID, BoilerCategory.UID);
 
       if(MTEEnoughItemsConfig.railcraft.fluid_firebox){
         registry.addRecipes(FluidFireboxCategory.getRecipes(jeiHelpers), FluidFireboxCategory.UID);
@@ -176,7 +173,7 @@ public class MTEEIPlugin implements IModPlugin {
       registry.addRecipes(TreeFluidCategory.getRecipes(jeiHelpers), TreeFluidCategory.UID);
       registry.addRecipes(TreeFluidFuelCategory.getRecipes(jeiHelpers), TreeFluidFuelCategory.UID);
 
-      registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.ThermalExpansion.name, "device",3),TreeFluidCategory.UID,TreeFluidFuelCategory.UID);
+      RegistryUtils.tryAddItemCatalyst(registry,ItemUtils.getItemstack(ModChecker.ThermalExpansion.name, "device",3),TreeFluidCategory.UID,TreeFluidFuelCategory.UID);
       registry.addRecipeClickArea(GuiTapper.class,62,35,16,16,TreeFluidCategory.UID,TreeFluidFuelCategory.UID);
 
       MTEEnoughItems.getLogger().info("Loaded Thermal Expansion recipes in {}ms",timer.stagedTime());
@@ -185,35 +182,21 @@ public class MTEEIPlugin implements IModPlugin {
     if(ModChecker.ImmersiveEngineering.isLoaded()){
       if (MTEEnoughItemsConfig.immersiveEngineering.diesel_generator){
         registry.addRecipes(DieselGeneratorCategory.getRecipes(jeiHelpers),DieselGeneratorCategory.UID);
-        registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.ImmersiveEngineering.name,"metal_multiblock",10),DieselGeneratorCategory.UID);
+        RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.ImmersiveEngineering.name,"metal_multiblock",10),DieselGeneratorCategory.UID);
       }
 
       if (MTEEnoughItemsConfig.immersiveEngineering.mineral_deposit){
         registry.addRecipes(MineralDepositCategory.getRecipes(jeiHelpers),MineralDepositCategory.UID);
-        registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.ImmersiveEngineering.name,"metal_device1",7),MineralDepositCategory.UID);
-        registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.ImmersiveEngineering.name,"metal_multiblock",11),MineralDepositCategory.UID);
-        registry.addRecipeCatalyst(ItemUtils.getItemstack(ModChecker.ImmersiveEngineering.name,"metal_multiblock",12),MineralDepositCategory.UID);
+        RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.ImmersiveEngineering.name,"metal_device1",7),MineralDepositCategory.UID);
+        RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.ImmersiveEngineering.name,"metal_multiblock",11),MineralDepositCategory.UID);
+        RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.ImmersiveEngineering.name,"metal_multiblock",12),MineralDepositCategory.UID);
       }
       MTEEnoughItems.getLogger().info("Loaded Immersive Engineering recipes in {}ms",timer.stagedTime());
     }
   }
 
-  public static void addItemCatalystIfNotNull(@Nullable Item catalyst, IModRegistry registry, String... uid) {
-    addItemCatalystIfNotNull(catalyst, 0, registry, uid);
-  }
-  public static void addItemCatalystIfNotNull(@Nullable Item catalyst, int meta, IModRegistry registry, String... uid) {
-    if (catalyst != null)
-      registry.addRecipeCatalyst(new ItemStack(catalyst, 1, meta), uid);
-  }
-
-
   @Override
   public void onRuntimeAvailable(IJeiRuntime jeiRuntimeIn) {
     MTEEIPlugin.jeiRuntime = jeiRuntimeIn;
   }
-
-  @Override
-  public void registerIngredients(IModIngredientRegistration ingredientRegistration) {
-  }
-
 }
