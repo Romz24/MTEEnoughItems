@@ -8,6 +8,7 @@ The mod lets player check recipe in JEI for these things from these mods:
   - Peat Engine (fuel, ash output)
   - Biogas engine (fuel, lava consumption)
   - Bio Generator (fuel)
+  - Beekeeping Flowers Definition
 - Railcraft
   - Fluid Fueled Firebox (fuel)
   - Steam Boiler (water to steam conversion)
