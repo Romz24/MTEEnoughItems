@@ -58,7 +58,7 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
             this.addItemSlot(guiItemStackGroup,i,MARGIN_X+18*(i%9),20+18*((i-1)/9));
             guiItemStackGroup.set(i,wrapper.items.get(i));
 
-            callbacks.add(i,wrapper.getStates().get(i));
+            callbacks.add(i,wrapper.getFlowerDefs().get(i).blockState);
         }
 
         guiItemStackGroup.addTooltipCallback(new TooltipCallback(wrapper, callbacks.getItemCallback()));
@@ -111,31 +111,44 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
             for (Block block : blocks.get(flowerType)) {
                 states.add(block.getDefaultState());
             }
-            List<IBlockState> states1 = new ArrayList<>(states);
-            states1.sort(Comparator.comparing(Object::toString));
-
-            boolean[] plantable = new boolean[states.size()];
-            for (int i = 0; i < states1.size(); i++) {
-                IBlockState state = states1.get(i);
+            List<FlowerDef> flowerDefs = new ArrayList<>();
+            for (IBlockState state : states) {
+                boolean plantable=false;
                 for (Flower flower : plantableFlowers.get(flowerType)) {
                     if(flower.getBlockState()==state){
-                        plantable[i]=true;
+                        plantable=true;
                         break;
                     }
                 }
+                flowerDefs.add(new FlowerDef(state, plantable));
             }
 
-            recipes.add(new Wrapper(flowerTypes.get(flowerType),states1,plantable));
+            List<IBlockState> states1 = new ArrayList<>(states);
+            states1.sort(Comparator.comparing(Object::toString));
+
+            for (int i = 0; i < flowerDefs.size(); i=i+45) {
+                List<FlowerDef> subList = flowerDefs.subList(i,Math.min(i+45,flowerDefs.size()));
+                recipes.add(new Wrapper(flowerTypes.get(flowerType),subList));
+            }
         }
 
         return recipes;
     }
 
+    public static class FlowerDef{
+        public final boolean plantable;
+        public final IBlockState blockState;
+        public FlowerDef(IBlockState blockState,boolean plantable) {
+            this.plantable = plantable;
+            this.blockState = blockState;
+        }
+    }
+
     public static class TooltipCallback implements ITooltipCallback<ItemStack> {
-        private final boolean[] plantable;
+        private final Wrapper wrapper;
         private final ITooltipCallback<ItemStack> parent;
         public TooltipCallback(Wrapper wrapper,ITooltipCallback<ItemStack> parent) {
-            plantable=wrapper.getPlantable().clone();
+            this.wrapper=wrapper;
             this.parent=parent;
         }
 
@@ -143,8 +156,8 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
         public void onTooltip(int i, boolean b, ItemStack stack, List<String> list) {
             this.parent.onTooltip(i, b, stack, list);
 
-            if(i>=plantable.length) return;
-            if(plantable[i]){
+            if(i>=wrapper.size) return;
+            if(wrapper.getFlowerDefs().get(i).plantable){
                 list.add(I18n.format("category.mteenoughitems.forestry.beekeeping_flowers.grow"));
             }
         }
@@ -153,20 +166,18 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
     public static class Wrapper implements IRecipeWrapper {
         public final FlowerProvider provider;
         public final int size;
-        private final List<IBlockState> states;
+        public final List<FlowerDef> flowerDefs;
         private final List<ItemStack> items;
-        private final boolean[] plantable;
 
-        public Wrapper(FlowerProvider provider, List<IBlockState> states, boolean[] plantable) {
+        public Wrapper(FlowerProvider provider, List<FlowerDef> flowerDefs) {
             super();
             this.provider=provider;
-            this.states = Collections.unmodifiableList(states);
-            this.size=states.size();
+            this.flowerDefs = Collections.unmodifiableList(flowerDefs);
+            this.size=flowerDefs.size();
 
-            this.plantable = plantable;
             ArrayList<ItemStack> items = new ArrayList<>(size);
-            for (int i = 0; i < states.size(); i++) {
-                items.add(BlockDropChecker.getDrop(states.get(i)));
+            for (FlowerDef flowerDef : flowerDefs) {
+                items.add(BlockDropChecker.getDrop(flowerDef.blockState));
             }
 
             this.items=Collections.unmodifiableList(items);
@@ -175,6 +186,13 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
         @Override
         public void getIngredients(IIngredients iIngredients) {
             iIngredients.setInputs(VanillaTypes.ITEM,items);
+            List<ItemStack> outputs = new ArrayList<>();
+            for (int i = 0; i < items.size(); i++) {
+                if(flowerDefs.get(i).plantable){
+                    outputs.add(items.get(i));
+                }
+            }
+            iIngredients.setOutputs(VanillaTypes.ITEM,outputs);
         }
 
         @Override
@@ -184,12 +202,8 @@ public class BeekeepingFlowersCategory extends GenericRecipeCategory<BeekeepingF
             RenderUtils.drawTextAlignedMiddle(provider.getDescription(),recipeWidth/2,yPos, Color.gray.getRGB());
         }
 
-        public List<IBlockState> getStates() {
-            return states;
-        }
-
-        public boolean[] getPlantable() {
-            return plantable;
+        public List<FlowerDef> getFlowerDefs() {
+            return flowerDefs;
         }
     }
 }
