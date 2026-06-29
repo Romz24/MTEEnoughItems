@@ -56,7 +56,15 @@ public class BoilerCategory extends FluidHeatConversionCategory<BoilerCategory.B
 
     public static List<BoilerRecipe> getRecipes(IJeiHelpers jeiHelpers){
         List<BoilerRecipe> recipes = new ArrayList<>();
-        recipes.add(new BoilerRecipe(jeiHelpers,new FluidStack(FluidRegistry.WATER,1),new FluidStack(Fluids.STEAM.get(), SteamConstants.STEAM_PER_UNIT_WATER)));
+
+        Fluids.STEAM.get().ifPresent(steam ->
+                recipes.add(new BoilerRecipe(
+                        jeiHelpers,
+                        new FluidStack(FluidRegistry.WATER, 1),
+                        new FluidStack(steam, SteamConstants.STEAM_PER_UNIT_WATER)
+                ))
+        );
+
         return recipes;
     }
 

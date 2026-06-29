@@ -90,7 +90,7 @@ public class WorldSpikeFuelCategory extends GenericRecipeCategory<WorldSpikeFuel
         @Override
         public void getIngredients(IIngredients iIngredients) {
             List<List<ItemStack>> inputs = new ArrayList<>();
-            inputs.add(Arrays.asList(ingredient.matchingStacks));
+            inputs.add(Arrays.asList(ingredient.getMatchingStacks()));
             ItemBlock worldspikeItem = RailcraftBlocks.WORLDSPIKE.item();
             if(worldspikeItem!=null)
                 inputs.add(Collections.singletonList(new ItemStack(worldspikeItem,1,this.variant)));

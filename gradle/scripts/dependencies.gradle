@@ -52,10 +52,10 @@ dependencies {
     implementation rfg.deobf("curse.maven:forestry-59751:2918418")
     implementation rfg.deobf("libs:industrialcraft-2-2.8.222-ex112")
     // Railcraft
-    implementation rfg.deobf('libs:railcraft-12.0.0')
+    implementation rfg.deobf('libs:railcraft-12.1.0-beta-9')
 
     //Thermal
-    implementation rfg.deobf('libs:CodeChickenLib-1.12.2-3.2.3.358-universal')
+    implementation rfg.deobf('libs:codechickenlib-3.3.5-universal')
     implementation rfg.deobf('libs:CoFHCore-1.12.2-4.6.6.1-universal')
     implementation rfg.deobf('libs:CoFHWorld-1.12.2-1.4.0.1-universal')
     implementation rfg.deobf('libs:RedstoneFlux-1.12-2.1.1.1-universal')
@@ -64,7 +64,7 @@ dependencies {
     implementation rfg.deobf('libs:ThermalFoundation-1.12.2-2.6.7.1-universal')
 
     //Buildcraft
-    implementation rfg.deobf('libs:buildcraft-all-7.99.24.8')
+    implementation rfg.deobf('libs:buildcraft-all-8.0.0')
     //ImmersiveEngineering
     implementation rfg.deobf('libs:ImmersiveEngineering-0.12-98')
 

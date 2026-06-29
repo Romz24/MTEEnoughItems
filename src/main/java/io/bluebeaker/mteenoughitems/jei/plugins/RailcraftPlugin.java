@@ -13,8 +13,7 @@ import mezz.jei.api.IJeiHelpers;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.recipe.IRecipeCategoryRegistration;
 import mods.railcraft.client.gui.GuiBlastFurnace;
-import mods.railcraft.client.gui.GuiBoilerFluid;
-import mods.railcraft.client.gui.GuiBoilerSolid;
+import mods.railcraft.client.gui.GuiBoiler;
 import mods.railcraft.client.gui.GuiWorldspike;
 
 public class RailcraftPlugin implements IPlugin {
@@ -47,8 +46,8 @@ public class RailcraftPlugin implements IPlugin {
         registry.addRecipeClickArea(GuiBlastFurnace.class,56,36,14,14,BlastFurnaceFuelCategory.UID);
         registry.addRecipeClickArea(GuiWorldspike.class,90,23,32,18,WorldSpikeFuelCategory.UID);
 
-        registry.addRecipeClickArea(GuiBoilerFluid.class,62,38,14,14,FluidFireboxCategory.UID,BoilerCategory.UID);
-        registry.addRecipeClickArea(GuiBoilerSolid.class,62,22,14,14,BoilerCategory.UID);
+        registry.addRecipeClickArea(GuiBoiler.class,62,38,14,14,FluidFireboxCategory.UID,BoilerCategory.UID);
+        registry.addRecipeClickArea(GuiBoiler.class,62,22,14,14,BoilerCategory.UID);
 
         for (int i = 1; i <=3; i++) {
             RegistryUtils.tryAddItemCatalyst(registry, ItemUtils.getItemstack(ModChecker.Railcraft.name, "worldspike",i), WorldSpikeFuelCategory.UID);
